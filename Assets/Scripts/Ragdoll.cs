@@ -14,7 +14,7 @@ public class Ragdoll : MonoBehaviour
         foreach (Rigidbody body in _rigBodies)
         {
             //body.freezeRotation = !_ragdollActive;
-            body.mass *= 0.5f;
+            body.mass *= 0.2f;
         }
     }
 
@@ -25,6 +25,10 @@ public class Ragdoll : MonoBehaviour
         {
             _ragdollActive = !_ragdollActive;
         }
+
+        if (Input.GetMouseButtonDown(1) && !_ragdollActive)
+            _ragdollActive = true;
+
     }
 
     private void FixedUpdate()
@@ -32,8 +36,8 @@ public class Ragdoll : MonoBehaviour
         foreach (Rigidbody body in _rigBodies)
         {
             //body.freezeRotation = !_ragdollActive;
-            body.velocity = _ragdollActive ? body.velocity : Vector3.zero;
-            body.constraints = _ragdollActive ? RigidbodyConstraints.None : RigidbodyConstraints.FreezeAll;
+            body.velocity = _ragdollActive || body.name.Contains("Arm") ? body.velocity : Vector3.zero;
+            body.constraints = _ragdollActive || body.name.Contains("Arm") ? RigidbodyConstraints.None : RigidbodyConstraints.FreezeAll;
         }
     }
 
