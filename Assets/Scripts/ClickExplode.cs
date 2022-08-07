@@ -1,41 +1,92 @@
 using System.Collections;
 using System.Collections.Generic;
 using UnityEngine;
+using UnityEngine.UI;
 
 public class ClickExplode : MonoBehaviour
 {
-    [SerializeField] float _explodeForce;
-    [SerializeField] float _explodeRadius, _explodeUpForce;
+    [System.Serializable]
+    public struct Explosion
+    {
+        public float force;
+        public float radius;
+        public float upForce;
+        public Button button;
+    }
+    [SerializeField] Explosion[] explosionOptions;
+    [SerializeField] Explosion currentExplosion;
     [SerializeField] GameObject _explosionPrefab;
+    [SerializeField] bool _addExplosionForce;
+    bool _explodePending;
+
+    private void Start()
+    {
+        SetExplosion(0);
+    }
 
     void Update()
     {
         if (Input.GetMouseButtonDown(1))
         {
+            _explodePending = true;
+        }
+    }
+
+    private void FixedUpdate()
+    {
+        if (_explodePending)
+        {
+            _explodePending = false;
             Ray ray = Camera.main.ScreenPointToRay(Input.mousePosition);
 
             RaycastHit[] hits = Physics.RaycastAll(ray);
 
             foreach (RaycastHit hit in hits)
             {
-                if (hit.collider.name.Contains("Plane"))
+                if (hit.collider.attachedRigidbody == null)
                 {
-                    Collider[] hitRagdolls = Physics.OverlapSphere(hit.point, _explodeRadius);
+                    Instantiate(_explosionPrefab, hit.point, Quaternion.identity);
+                    Collider[] hitRagdolls = Physics.OverlapSphere(hit.point, currentExplosion.radius);
                     foreach (Collider coll in hitRagdolls)
                     {
                         if (coll.TryGetComponent<Rigidbody>(out Rigidbody rb))
                         {
-                            rb.AddExplosionForce(_explodeForce, hit.point, _explodeRadius, _explodeUpForce, ForceMode.Impulse);
-                            //Vector3 direction = coll.transform.position - hit.point;
-                            //float sqMag = direction.sqrMagnitude;
-                            //Vector3 finalForce = direction.normalized * (_explodeForce / sqMag);
-                            //rb.AddForce(finalForce, ForceMode.Force);
+                            bool _hipsHit = false;
+
+                            if (coll.name.Contains("Hips"))
+                                _hipsHit = true;
+
+                            if (_addExplosionForce)
+                            {
+                                rb.AddExplosionForce(_hipsHit ? currentExplosion.force : currentExplosion.force/2f, hit.point, currentExplosion.radius, currentExplosion.upForce, ForceMode.Impulse);
+                            }
+                            else
+                            {
+                                Vector3 direction = (coll.transform.position - hit.point) + (Vector3.up * currentExplosion.upForce);
+                                float sqMag = direction.sqrMagnitude;
+                                Vector3 finalForce = direction.normalized * (currentExplosion.force / sqMag);
+                                rb.AddForce(finalForce, ForceMode.Impulse);
+                            }
                         }
                     }
+                    break;
                 }
-
-                Instantiate(_explosionPrefab, hit.point, new Quaternion(0, 0, 0, 0));
             }
         }
+    }
+
+    public void SetExplosion(int i)
+    {
+        if (currentExplosion.button != null)
+        {
+            ColorBlock oldButtonCol = currentExplosion.button.colors;
+            oldButtonCol.normalColor = Color.white;
+            currentExplosion.button.colors = oldButtonCol;
+        }
+
+        currentExplosion = explosionOptions[i];
+        ColorBlock newButtonCol = currentExplosion.button.colors;
+        newButtonCol.normalColor = currentExplosion.button.colors.selectedColor;
+        currentExplosion.button.colors = newButtonCol;
     }
 }
