@@ -39,7 +39,17 @@ public class ClickExplode : MonoBehaviour
             _explodePending = false;
             Ray ray = Camera.main.ScreenPointToRay(Input.mousePosition);
 
-            RaycastHit[] hits = Physics.RaycastAll(ray);
+            RaycastHit[] tempHits = Physics.RaycastAll(ray);
+            List<RaycastHit> hits = new List<RaycastHit>();
+
+            for (int i = 0; i < tempHits.Length; i++)
+            {
+                hits.Add(tempHits[i]);
+            }
+
+            hits.Sort(
+                (x,y) => Vector3.Distance(x.point, ray.origin).CompareTo(Vector3.Distance(y.point, ray.origin))
+                );
 
             foreach (RaycastHit hit in hits)
             {
@@ -51,14 +61,9 @@ public class ClickExplode : MonoBehaviour
                     {
                         if (coll.TryGetComponent<Rigidbody>(out Rigidbody rb))
                         {
-                            bool _hipsHit = false;
-
-                            if (coll.name.Contains("Hips"))
-                                _hipsHit = true;
-
                             if (_addExplosionForce)
                             {
-                                rb.AddExplosionForce(_hipsHit ? currentExplosion.force : currentExplosion.force/2f, hit.point, currentExplosion.radius, currentExplosion.upForce, ForceMode.Impulse);
+                                rb.AddExplosionForce(currentExplosion.force, hit.point, currentExplosion.radius, currentExplosion.upForce, ForceMode.Impulse);
                             }
                             else
                             {
@@ -69,7 +74,7 @@ public class ClickExplode : MonoBehaviour
                             }
                         }
                     }
-                    break;
+                    return;
                 }
             }
         }
