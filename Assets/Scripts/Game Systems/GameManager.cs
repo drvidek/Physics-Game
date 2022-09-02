@@ -6,21 +6,19 @@ using UnityEngine.SceneManagement;
 
 public class GameManager : MonoBehaviour
 {
+    private static bool _firstLoadComplete;
     [SerializeField] Button _nextSceneButton;
-    
+    [SerializeField] private int[] frameRates = { 30, 60, 120 };
+
     // Start is called before the first frame update
     void Start()
     {
-        _nextSceneButton.interactable = false;
-    }
-
-    // Update is called once per frame
-    void Update()
-    {
-        if (Input.GetKeyDown(KeyCode.R))
+        if (!_firstLoadComplete)
         {
-            RestartScene();
+            SetFrameRate(frameRates[0]);
+            _firstLoadComplete = true;
         }
+        _nextSceneButton.interactable = false;
     }
 
     public void RestartScene()
@@ -34,8 +32,39 @@ public class GameManager : MonoBehaviour
         SceneManager.LoadScene(gameObject.scene.buildIndex + 1);
     }
 
+    public void GoToScene(int i)
+    {
+        SceneManager.LoadScene(i);
+    }
+
     public void EnableNextScene()
     {
-        _nextSceneButton.interactable = true;
+        if (SceneManager.GetSceneByBuildIndex(gameObject.scene.buildIndex + 1) != null)
+            _nextSceneButton.interactable = true;
     }
+
+    public void GetFrameRateFromDropdown(int selection)
+    {
+        SetFrameRate(frameRates[selection]);
+    }
+
+    public void SetFrameRate(int rate)
+    {
+        Application.targetFrameRate = rate;
+    }
+
+    public static bool ValidateCollisionWithPlayer(Collision collision, out Ragdoll ragdoll)
+    {
+        ragdoll = collision.gameObject.GetComponentInParent<Ragdoll>();
+        return ragdoll != null && !ragdoll.Impacted;
+    }
+    
+    public void QuitGame()
+    {
+#if UNITY_EDITOR
+        UnityEditor.EditorApplication.isPlaying = false;
+#endif
+        Application.Quit();
+    }
+
 }

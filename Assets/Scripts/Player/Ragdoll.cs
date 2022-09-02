@@ -6,7 +6,16 @@ public class Ragdoll : MonoBehaviour
 {
     bool _ragdollActive;
     Rigidbody[] _rigBodies;
+    public Rigidbody[] RigBodies
+    {
+        get => _rigBodies;
+    }
     [SerializeField] private float _massMultiplier;
+    private float _impactTime;
+    public bool Impacted
+    {
+        get => _impactTime > 0;
+    }
 
     // Start is called before the first frame update
     void Start()
@@ -30,6 +39,7 @@ public class Ragdoll : MonoBehaviour
         if (Input.GetMouseButtonDown(1) && !_ragdollActive)
             _ragdollActive = true;
 
+        _impactTime = Mathf.MoveTowards(_impactTime, 0, Time.deltaTime);
     }
 
     private void FixedUpdate()
@@ -48,8 +58,6 @@ public class Ragdoll : MonoBehaviour
         {
             _ragdollActive = true;
         }
-
-
     }
 
     public void ApplySlowdown(float rate)
@@ -58,5 +66,10 @@ public class Ragdoll : MonoBehaviour
         {
             body.velocity *= rate;
         }
+    }
+
+    public void ApplyImpact(float time)
+    {
+        _impactTime = time;
     }
 }
