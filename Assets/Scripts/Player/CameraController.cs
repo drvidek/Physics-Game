@@ -1,10 +1,7 @@
-using System.Collections;
-using System.Collections.Generic;
 using UnityEngine;
 
 public class CameraController : MonoBehaviour
 {
-    Vector3 _homeRot;
     Vector3 _posOffset;
     [SerializeField] GameObject _followOb;
 

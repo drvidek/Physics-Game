@@ -1,5 +1,3 @@
-using System.Collections;
-using System.Collections.Generic;
 using UnityEngine;
 
 public class ElectricFence : MonoBehaviour
@@ -8,7 +6,6 @@ public class ElectricFence : MonoBehaviour
     [SerializeField] private float _animSpd;
 
     [SerializeField] private float _slowdownMultiplier;
-
 
     // Start is called before the first frame update
     void Start()

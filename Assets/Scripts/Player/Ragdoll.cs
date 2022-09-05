@@ -1,5 +1,3 @@
-using System.Collections;
-using System.Collections.Generic;
 using UnityEngine;
 
 public class Ragdoll : MonoBehaviour
@@ -51,15 +49,7 @@ public class Ragdoll : MonoBehaviour
             body.constraints = _ragdollActive || body.name.Contains("Arm") ? RigidbodyConstraints.None : RigidbodyConstraints.FreezeAll;
         }
     }
-
-    private void OnTriggerEnter(Collider other)
-    {
-        if (other.GetComponentInParent<Move>())
-        {
-            _ragdollActive = true;
-        }
-    }
-
+    
     public void ApplySlowdown(float rate)
     {
         foreach (Rigidbody body in _rigBodies)

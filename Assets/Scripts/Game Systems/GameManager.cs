@@ -1,5 +1,3 @@
-using System.Collections;
-using System.Collections.Generic;
 using UnityEngine;
 using UnityEngine.UI;
 using UnityEngine.SceneManagement;
@@ -7,7 +5,7 @@ using UnityEngine.SceneManagement;
 public class GameManager : MonoBehaviour
 {
     private static bool _firstLoadComplete;
-    [SerializeField] Button _nextSceneButton;
+    [SerializeField] private Button _nextSceneButton;
     [SerializeField] private int[] frameRates = { 30, 60, 120 };
 
     // Start is called before the first frame update
