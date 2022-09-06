@@ -1,11 +1,13 @@
 using UnityEngine;
 using UnityEngine.UI;
 using UnityEngine.SceneManagement;
+using TMPro;
 
 public class GameManager : MonoBehaviour
 {
     private static bool _firstLoadComplete;
     [SerializeField] private Button _nextSceneButton;
+    [SerializeField] private TextMeshProUGUI _fpsCounter;
     [SerializeField] private int[] frameRates = { 30, 60, 120 };
 
     // Start is called before the first frame update
@@ -13,10 +15,17 @@ public class GameManager : MonoBehaviour
     {
         if (!_firstLoadComplete)
         {
+            QualitySettings.vSyncCount = 0;
             SetFrameRate(frameRates[0]);
+            FPS.MaxFrames = frameRates[0];
             _firstLoadComplete = true;
         }
         _nextSceneButton.interactable = false;
+    }
+
+    private void Update()
+    {
+        _fpsCounter.text = "FPS: " + Mathf.Round(FPS.GetCurrentFPS()).ToString();
     }
 
     public void RestartScene()
@@ -49,6 +58,7 @@ public class GameManager : MonoBehaviour
     public void SetFrameRate(int rate)
     {
         Application.targetFrameRate = rate;
+        FPS.MaxFrames = rate;
     }
 
     public static bool ValidateCollisionWithPlayer(Collision collision, out Ragdoll ragdoll)
